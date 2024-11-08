@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { PlayerRole } from 'src/common/enum/player-role.enum';
-import { openWam } from 'src/common/utils/utils';
-import { GameEntity } from 'src/entity/game.entity';
-import { PlayerEntity } from 'src/entity/player.entity';
-import { Repository } from 'typeorm';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { PlayerRole } from "src/common/enum/player-role.enum";
+import { openWam } from "src/common/utils/utils";
+import { GameEntity } from "src/entity/game.entity";
+import { PlayerEntity } from "src/entity/player.entity";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class PlayerService {
@@ -13,8 +13,18 @@ export class PlayerService {
     private readonly playerRepository: Repository<PlayerEntity>
   ) {}
 
-  async createPlayer(callerId: string, game: GameEntity) {
-    const player = this.playerRepository.create({ callerId, game });
+  async createPlayer(
+    callerId: string,
+    game: GameEntity,
+    username: string,
+    profileUrl: string
+  ) {
+    const player = this.playerRepository.create({
+      callerId,
+      game,
+      username,
+      profileUrl,
+    });
     console.log(player);
     await this.playerRepository.save(player);
   }

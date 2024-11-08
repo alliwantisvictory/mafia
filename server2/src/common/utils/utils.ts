@@ -174,7 +174,7 @@ export async function getUserInfo(channelId: string, userId: string) {
     throw new Error("유저 정보 가져오는데 실패했습니다.");
   }
 
-  return response;
+  return response.data.result;
 }
 
 export async function getManagerInfo(channelId: string, managerId: string) {
@@ -203,7 +203,7 @@ export async function getManagerInfo(channelId: string, managerId: string) {
     throw new Error("매니저 정보 가져오는데 실패했습니다.");
   }
 
-  return response;
+  return response.data.result;
 }
 
 export function tutorial(wamName: string, callerId: string, params: any) {

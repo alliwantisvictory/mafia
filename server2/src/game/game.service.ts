@@ -25,7 +25,7 @@ export class GameService {
   private readonly createMafiaGameMsg =
     '/join을 통해 마피아 게임에 참여해보세요!';
   private readonly startMafiaGameMsg =
-    '마피아 게임을 시작합니다! /job을 통해 자신의 역할을 확인하세요.';
+    "마피아 게임을 시작합니다! /role을 통해 자신의 역할을 확인하세요.";
   private readonly dayMafiaGameMsg =
     '낮이 되었습니다. 자유롭게 이야기하며 마피아를 찾아보세요.';
   private readonly nightMafiaGameMsg =
@@ -64,8 +64,6 @@ export class GameService {
     const newGame = this.gameRepository.create({ chatId });
     await this.gameRepository.save(newGame);
 
-    await this.playerService.createPlayer(callerId, newGame);
-
     await sendAsBot(
       channelId,
       groupId,
@@ -80,7 +78,12 @@ export class GameService {
       console.log(userInfo);
     } catch (error) {
       const managerInfo = await getManagerInfo(channelId, callerId);
-      console.log(managerInfo);
+      await this.playerService.createPlayer(
+        callerId,
+        newGame,
+        managerInfo.manager.name,
+        managerInfo.manager.avatarUrl
+      );
     }
   }
 
@@ -96,17 +99,28 @@ export class GameService {
       where: { chatId, status: GameStatus.NEW },
     });
 
-    await this.playerService.createPlayer(callerId, game);
-
-    await sendAsBot(
-      channelId,
-      groupId,
-      broadcast,
-      rootMessageId,
-      `${callerId}${this.joinMsg}`,
-      this.botName
-    );
+    try {
+      const userInfo = await getUserInfo(channelId, callerId);
+      return;
+    } catch (error) {
+      const managerInfo = await getManagerInfo(channelId, callerId);
+      await this.playerService.createPlayer(
+        callerId,
+        game,
+        managerInfo.manager.name,
+        managerInfo.manager.avatarUrl
+      );
+      await sendAsBot(
+        channelId,
+        groupId,
+        broadcast,
+        rootMessageId,
+        `${managerInfo.manager.name}${this.joinMsg}`,
+        this.botName
+      );
+    }
   }
+
   async startGame(
     channelId: string,
     groupId: string,
