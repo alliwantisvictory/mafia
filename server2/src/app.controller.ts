@@ -7,50 +7,58 @@ import {
   HttpStatus,
   Res,
   Get,
-} from '@nestjs/common';
-import { AppService } from './app.service';
-import { Response } from 'express';
+} from "@nestjs/common";
+import { AppService } from "./app.service";
+import { Response } from "express";
+import { GameService } from "./game/game.service";
+import { sendAsBot, tutorial, verification } from "./common/utils/utils";
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly gameService: GameService) {}
 
   @Get()
   async getHello() {
-    return 'hello!';
+    return "hello!";
   }
 
-  @Put('/functions')
+  @Put("/functions")
   async handleFunction(
     @Body() body: any,
-    @Headers('x-signature') signature: string,
-    @Res() res: Response,
+    @Headers("x-signature") signature: string,
+    @Res() res: Response
   ) {
-    if (
-      !signature ||
-      !this.appService.verification(signature, JSON.stringify(body))
-    ) {
-      return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
+    if (!signature || !verification(signature, JSON.stringify(body))) {
+      return res.status(HttpStatus.UNAUTHORIZED).send("Unauthorized");
     }
 
     const { method, context, params } = body;
     const { caller, channel } = context;
 
+    console.log(body);
+    console.log(context);
+
     switch (method) {
-      case 'tutorial':
-        return res.json(
-          this.appService.tutorial('wam_name', caller.id, params),
-        );
-      case 'sendAsBot':
-        await this.appService.sendAsBot(
+      case "tutorial":
+        return res.json(tutorial("wam_name", caller.id, params));
+      case "sendAsBot":
+        await sendAsBot(
           channel.id,
           params.input.groupId,
           params.input.broadcast,
-          params.input.rootMessageId,
+          params.input.rootMessageId
+        );
+      case "mafia":
+        await this.gameService.createMafiaGame(
+          context.channel.id,
+          params.chat.id,
+          false,
+          context.caller.id,
+          params.input.rootMessageId
         );
         return res.json({ result: {} });
       default:
-        return res.status(HttpStatus.BAD_REQUEST).send('Unknown method');
+        return res.status(HttpStatus.BAD_REQUEST).send("Unknown method");
     }
   }
 }
