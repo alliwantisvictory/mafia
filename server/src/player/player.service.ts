@@ -21,6 +21,7 @@ export class PlayerService {
   async showJob(callerId: string, params: any) {
     const player = await this.playerRepository.findOne({ where: { callerId } });
     const args = {
+      wamName: "ROLE",
       role: player.role,
     };
     return openWam("wam_name", args, params);
