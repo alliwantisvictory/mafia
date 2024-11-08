@@ -78,7 +78,11 @@ export class AppController {
         return res.json({ result: {} });
       case "role":
         const role = await this.playerService.getJob(context.caller.id);
-        return res.json(openWam("ROLE", {role: role}, params));
+        if (role == "MAFIA") {
+          return res.json(openWam("ROLE_MAFIA", { role: role }, params));
+        } else {
+          return res.json(openWam("ROLE", { role: role }, params));
+        }
       case "start":
         await this.gameService.startGame(
           context.channel.id,
