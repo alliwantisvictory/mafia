@@ -242,7 +242,7 @@ export function verification(x_signature: string, body: string): boolean {
 }
 
 export function openWam(
-  wamName: string,
+  name: string,
   wamArgs: { [key: string]: any },
   params: any
 ) {
@@ -258,8 +258,11 @@ export function openWam(
       type: "wam",
       attributes: {
         appId: process.env.APP_ID,
-        name: wamName,
-        wamArgs,
+        name: "wam_name",
+        wamArgs: {
+          ...wamArgs,
+          name: name,
+        },
       },
     },
   };

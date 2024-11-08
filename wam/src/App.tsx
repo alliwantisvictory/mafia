@@ -13,7 +13,7 @@ import PoliceVote from './pages/vote/PoliceVote'
 import Role from './pages/Role/Role'
 
 function App() {
-  const wamName = useMemo(() => getWamData('wamName'), [])
+  const wamName = useMemo(() => getWamData('name'), [])
   const renderWam = () => {
     switch (wamName) {
       case 'wam_name':

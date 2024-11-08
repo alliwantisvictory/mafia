@@ -16,15 +16,13 @@ interface Props {
 }
 
 const Vote = ({ color }: Props) => {
-  const players: Player[] = useMemo(
-    () => JSON.parse(getWamData('players') ?? '[]'),
-    []
-  )
+  // @ts-expect-error error
+  const players = useMemo<Player[]>(() => getWamData('players'), [])
   const [selected, setSelected] = useState<string>()
 
   return (
     <Styled.VoteItemWrapper>
-      {players.map((player) => (
+      {players.map((player: Player) => (
         <VoteItem
           selected={selected === player.id}
           onClick={() => setSelected(player.id)}

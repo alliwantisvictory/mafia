@@ -57,6 +57,7 @@ export class AppController {
           params.input.broadcast,
           params.input.rootMessageId
         );
+        break;
       case "mafia":
         await this.gameService.createMafiaGame(
           context.channel.id,
@@ -66,6 +67,7 @@ export class AppController {
           context.caller.id,
           params.input.rootMessageId
         );
+        break;
       case "join":
         await this.gameService.joinMafiaGame(
           context.channel.id,
@@ -78,7 +80,7 @@ export class AppController {
         return res.json({ result: {} });
       case "role":
         const role = await this.playerService.getJob(context.caller.id);
-        return res.json(openWam("ROLE", {role: role}, params));
+        return res.json(openWam("ROLE", { role: role }, params));
       case "start":
         await this.gameService.startGame(
           context.channel.id,
@@ -93,6 +95,8 @@ export class AppController {
         const { phase, players } = await this.gameService.getPlayers(
           params.chat.id
         );
+        console.log("vote!!!!!!!!!");
+        console.log(phase, players);
         return res.json(openWam(phase, { players }, params));
       case "civilianVote":
         await this.gameService.civilianVote(
