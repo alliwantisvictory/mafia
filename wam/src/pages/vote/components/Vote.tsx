@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import * as Styled from '../Vote.styled'
+import Hamster from '/src/assets/images/hamster.png'
+import Confirm from '/src/assets/images/confirm.png'
 
 export type ColorType = 'red' | 'blue'
 
@@ -62,11 +64,11 @@ const VoteItem = ({ selected, onClick, color }: VoteItemProps) => {
   return (
     <Styled.VoteWrapper onClick={onClick}>
       <Styled.VoteImage>
-        <img src="/src/assets/images/hamster.png" />
+        <img src={Hamster} />
         {selected && (
           <Styled.SelectedIcon color={color}>
             <img
-              src="/src/assets/images/confirm.png"
+              src={Confirm}
               width={24}
               height={24}
             />
