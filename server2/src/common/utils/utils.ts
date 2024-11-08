@@ -97,6 +97,14 @@ export async function registerCommand(accessToken: string) {
           alfMode: "disable",
           enableByDefault: true,
         },
+        {
+          name: "execute",
+          scope: "desk",
+          description: "join a mafia game",
+          actionFunctionName: "execute",
+          alfMode: "disable",
+          enableByDefault: true,
+        },
       ],
     },
   };

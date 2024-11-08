@@ -6,7 +6,7 @@ import { setSize } from '../../utils/wam'
 
 const MafiaVote = () => {
   useEffect(() => {
-    setSize(448, 472)
+    setSize(448, 320)
   }, [])
 
   return (
@@ -16,7 +16,6 @@ const MafiaVote = () => {
     >
       <Styled.TitleText>누구를 죽일까요?</Styled.TitleText>
       <Vote color="red" />
-      <Styled.VoteButton color="red">확인</Styled.VoteButton>
     </VStack>
   )
 }

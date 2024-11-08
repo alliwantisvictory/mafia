@@ -7,7 +7,7 @@ import { setSize } from '../../utils/wam'
 
 const DoctorVote = () => {
   useEffect(() => {
-    setSize(448, 472)
+    setSize(448, 320)
   }, [])
 
   return (
@@ -22,7 +22,6 @@ const DoctorVote = () => {
         누구를 <Styled.Text color="blue">치료 </Styled.Text>할까요?
       </Styled.TitleText>
       <Vote color="blue" />
-      <Styled.VoteButton color="blue">확인</Styled.VoteButton>
     </VStack>
   )
 }

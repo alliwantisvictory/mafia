@@ -7,7 +7,7 @@ import { Button } from '@channel.io/bezier-react'
 
 const CivilianVote = () => {
   useEffect(() => {
-    setSize(448, 472)
+    setSize(448, 340)
   }, [])
 
   return (

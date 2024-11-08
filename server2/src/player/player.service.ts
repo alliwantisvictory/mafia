@@ -39,7 +39,7 @@ export class PlayerService {
   }
 
   async vote(id: string, vote: string) {
-    await this.playerRepository.update({ id }, { vote });
+    await this.playerRepository.update({ callerId: id }, { vote });
   }
 
   async deathVote(id: string, deathVote: boolean) {

@@ -51,6 +51,7 @@ const Vote = ({ color }: Props) => {
         window.ChannelIOWam.close()
         break
       default:
+        window.ChannelIOWam.close()
         // NOTE: should not reach here
         console.error('Invalid message sender')
     }
@@ -98,6 +99,7 @@ const VoteItem = ({ selected, onClick, color, player }: VoteItemProps) => {
               src={Confirm}
               width={24}
               height={24}
+              style={{ objectFit: 'cover' }}
             />
           </Styled.SelectedIcon>
         )}

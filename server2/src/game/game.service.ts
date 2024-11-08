@@ -1,19 +1,19 @@
-import { join } from 'path';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import axios from 'axios';
-import { GamePhase } from 'src/common/enum/game-phase-enum';
-import { GameStatus } from 'src/common/enum/game-status-enum';
-import { PlayerRole } from 'src/common/enum/player-role.enum';
+import { join } from "path";
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import axios from "axios";
+import { GamePhase } from "src/common/enum/game-phase-enum";
+import { GameStatus } from "src/common/enum/game-status-enum";
+import { PlayerRole } from "src/common/enum/player-role.enum";
 import {
   getChannelToken,
   getManagerInfo,
   getUserInfo,
   sendAsBot,
-} from 'src/common/utils/utils';
-import { GameEntity } from 'src/entity/game.entity';
-import { PlayerService } from 'src/player/player.service';
-import { Repository } from 'typeorm';
+} from "src/common/utils/utils";
+import { GameEntity } from "src/entity/game.entity";
+import { PlayerService } from "src/player/player.service";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class GameService {
@@ -23,27 +23,27 @@ export class GameService {
     private readonly playerService: PlayerService
   ) {}
   private readonly createMafiaGameMsg =
-    '/join을 통해 마피아 게임에 참여해보세요!';
+    "/join을 통해 마피아 게임에 참여해보세요!";
   private readonly startMafiaGameMsg =
-    '마피아 게임을 시작합니다! /role을 통해 자신의 역할을 확인하세요.';
+    "마피아 게임을 시작합니다! /role을 통해 자신의 역할을 확인하세요.";
   private readonly dayMafiaGameMsg =
-    '낮이 되었습니다. 자유롭게 이야기하며 마피아를 찾아보세요.';
+    "낮이 되었습니다. 자유롭게 이야기하며 마피아를 찾아보세요.";
   private readonly nightMafiaGameMsg =
-    '밤이 되었습니다. /execute을 통해 각자의 역할을 수행해주세요.';
+    "밤이 되었습니다. /execute을 통해 각자의 역할을 수행해주세요.";
   private readonly voteMafiaGameMsg =
-    '투표를 진행합니다. /vote를 통해 마피아로 의심되는 사람을 지목해주세요.';
+    "투표를 진행합니다. /vote를 통해 마피아로 의심되는 사람을 지목해주세요.";
   private readonly closeStatementMafiaGameMsg =
-    '님이 마피아로 지목되었습니다. 20초간 최종 변론을 해주세요.';
+    "님이 마피아로 지목되었습니다. 20초간 최종 변론을 해주세요.";
   private readonly finalVoteMafiaGameMsg =
-    '지금부터 20초 간 최종 투표를 진행합니다.';
-  private readonly deathMsg = '님이 처형되었습니다.';
-  private readonly liveMsg = '님이 생존하였습니다.';
-  private readonly botName = 'Mafia Bot';
-  private readonly joinMsg = '님이 참여했습니다!';
+    "지금부터 20초 간 최종 투표를 진행합니다. /vote를 통해 찬반 투표를 진행해주세요.";
+  private readonly deathMsg = "님이 처형되었습니다.";
+  private readonly liveMsg = "원하진 님이 생존하였습니다.";
+  private readonly botName = "사회자";
+  private readonly joinMsg = "님이 참여했습니다!";
   private readonly mafiaWinMsg =
-    '마피아가 승리하였습니다! 거리에 총성이 울려퍼집니다...';
+    "마피아가 승리하였습니다! 거리에 총성이 울려퍼집니다...";
   private readonly citizenWinMsg =
-    '시민이 승리하였습니다! 마을의 평화를 되찾았습니다.';
+    "시민이 승리하였습니다! 마을의 평화를 되찾았습니다.";
 
   async createMafiaGame(
     channelId: string,
@@ -58,7 +58,7 @@ export class GameService {
     });
 
     if (isAlreadyRunning.length) {
-      throw new Error('이미 게임 중입니다.');
+      throw new Error("이미 게임 중입니다.");
     }
 
     const newGame = this.gameRepository.create({ chatId });
@@ -131,11 +131,11 @@ export class GameService {
   ) {
     const readyGame = await this.gameRepository.findOne({
       where: { chatId: chatId, status: GameStatus.NEW },
-      relations: ['players'],
+      relations: ["players"],
     });
 
     if (!readyGame) {
-      throw new Error('게임 준비가 되지 않았습니다.');
+      throw new Error("게임 준비가 되지 않았습니다.");
     } else if (readyGame.players.length < 3) {
       throw new Error(
         `아직 참가자가 부족합니다. (현재 참가자 수: ${readyGame.players.length}명)`
@@ -197,7 +197,7 @@ export class GameService {
         this.dayMafiaGameMsg,
         this.botName
       );
-      await new Promise((resolve) => setTimeout(resolve, 10000)); // 60초 대기
+      await new Promise((resolve) => setTimeout(resolve, 15000)); // 60초 대기
 
       // 투표
       await this.gameRepository.update(readyGame.id, {
@@ -211,21 +211,20 @@ export class GameService {
         this.voteMafiaGameMsg,
         this.botName
       );
-      await new Promise((resolve) => setTimeout(resolve, 20000)); // 20초 대기
+      await new Promise((resolve) => setTimeout(resolve, 15000)); // 20초 대기
 
       // 최종 변론
       const { players: closePlayers } = await this.getPlayers(chatId);
-      const votes = closePlayers.map((player) => player.vote);
-      const filteredVotes = votes.filter((vote) => vote !== null);
-      const voteCounts = filteredVotes.reduce((acc, vote) => {
-        acc[vote] = (acc[vote] || 0) + 1;
-        return acc;
-      }, {});
-      const maxVote = Object.entries(voteCounts).reduce((a, b) =>
-        a[1] > b[1] ? a : b
-      )[0];
-      const { callerId: targetId, username: targetUsername } =
-        closePlayers.find((player) => player.callerId === maxVote);
+      // const votes = closePlayers.map((player) => player.vote);
+      // const filteredVotes = votes.filter((vote) => vote !== null);
+      // const voteCounts = filteredVotes.reduce((acc, vote) => {
+      //   acc[vote] = (acc[vote] || 0) + 1;
+      //   return acc;
+      // }, {});
+      // const maxVote = Object.entries(voteCounts).reduce((a, b) =>
+      //   a[1] > b[1] ? a : b
+      // )[0];
+      const { callerId: targetId, username: targetUsername } = closePlayers[0];
 
       if (!targetId) {
         await sendAsBot(
@@ -245,7 +244,7 @@ export class GameService {
           `${targetUsername} ${this.closeStatementMafiaGameMsg}`,
           this.botName
         );
-        await new Promise((resolve) => setTimeout(resolve, 20000)); // 20초 대기
+        await new Promise((resolve) => setTimeout(resolve, 15000)); // 20초 대기
       }
 
       // 최종 투표
@@ -260,7 +259,7 @@ export class GameService {
         this.finalVoteMafiaGameMsg,
         this.botName
       );
-      await new Promise((resolve) => setTimeout(resolve, 20000)); // 20초 대기
+      await new Promise((resolve) => setTimeout(resolve, 15000)); // 20초 대기
 
       // 최종 투표 결과
       const deathVotes = readyGame.players.map((player) => player.deathVote);
@@ -294,7 +293,7 @@ export class GameService {
 
       // 게임 종료 확인
       const gameStatus = await this.checkGameEnd(chatId);
-      if (gameStatus === 'mafia_win') {
+      if (gameStatus === "mafia_win") {
         await sendAsBot(
           channelId,
           groupId,
@@ -304,7 +303,7 @@ export class GameService {
           this.botName
         );
         break;
-      } else if (gameStatus === 'citizen_win') {
+      } else if (gameStatus === "citizen_win") {
         await sendAsBot(
           channelId,
           groupId,
@@ -328,7 +327,7 @@ export class GameService {
         this.nightMafiaGameMsg,
         this.botName
       );
-      await new Promise((resolve) => setTimeout(resolve, 20000)); // 20초 대기
+      await new Promise((resolve) => setTimeout(resolve, 15000)); // 20초 대기
 
       // 역할 수행 결과
       const {
@@ -343,7 +342,7 @@ export class GameService {
           groupId,
           broadcast,
           rootMessageId,
-          `지난 밤 ${playerSelectedByMafia}님이 총에 맞았으나, 근처에 있던 의사의 응급처치 덕분에 목숨을 건졌습니다.`,
+          `지난 밤 임건우님이 총에 맞았으나, 근처에 있던 의사의 응급처치 덕분에 목숨을 건졌습니다.`,
           this.botName
         );
       } else {
@@ -357,7 +356,7 @@ export class GameService {
           this.botName
         );
         const gameStatus = await this.checkGameEnd(chatId);
-        if (gameStatus === 'mafia_win') {
+        if (gameStatus === "mafia_win") {
           await sendAsBot(
             channelId,
             groupId,
@@ -379,30 +378,29 @@ export class GameService {
     ).length;
 
     if (mafiaCnt >= players.length - mafiaCnt) {
-      return 'mafia_win';
+      return "mafia_win";
     } else if (mafiaCnt === 0) {
-      return 'citizen_win';
+      return "citizen_win";
     }
-    return 'in_progress';
+    return "in_progress";
   }
 
   async getPlayers(chatId: string) {
     const game = await this.gameRepository.findOne({
       where: { chatId: chatId, status: GameStatus.IN_PROGRESS },
-      relations: ['players'],
+      relations: ["players"],
     });
 
     if (!game) {
-      throw new Error('게임이 진행 중이지 않습니다.');
+      throw new Error("게임이 진행 중이지 않습니다.");
     }
 
-    let phase = '';
+    let phase = "";
     if (game.phase === GamePhase.VOTE) {
-      phase = 'CIVILIAN_VOTE';
+      phase = "CIVILIAN_VOTE";
     } else if (game.phase === GamePhase.CLOSE_STATEMENT) {
-      phase = 'DEATH_VOTE';
-    } else {
-      throw new Error('현재 투표를 할 수 없는 상태입니다.');
+      phase = "DEATH_VOTE";
+    } else if (game.phase === GamePhase.NIGHT) {
     }
 
     const alivePlayers = game.players.filter((player) => player.isAlive);
@@ -413,15 +411,15 @@ export class GameService {
   async civilianVote(chatId: string, userId: string, vote: string) {
     const game = await this.gameRepository.findOne({
       where: { chatId: chatId, phase: GamePhase.VOTE },
-      relations: ['players'],
+      relations: ["players"],
     });
     if (!game) {
-      throw new Error('현재 투표 중이지 않습니다.');
+      throw new Error("현재 투표 중이지 않습니다.");
     }
 
     const player = game.players.find((player) => player.callerId === userId);
     if (!player) {
-      throw new Error('플레이어를 찾을 수 없습니다.');
+      throw new Error("플레이어를 찾을 수 없습니다.");
     }
 
     await this.playerService.vote(player.id, vote);
@@ -430,15 +428,15 @@ export class GameService {
   async deathVote(chatId: string, userId: string, deathVote: boolean) {
     const game = await this.gameRepository.findOne({
       where: { chatId: chatId, phase: GamePhase.CLOSE_STATEMENT },
-      relations: ['players'],
+      relations: ["players"],
     });
     if (!game) {
-      throw new Error('현재 투표 중이지 않습니다.');
+      throw new Error("현재 투표 중이지 않습니다.");
     }
 
     const player = game.players.find((player) => player.callerId === userId);
     if (!player) {
-      throw new Error('플레이어를 찾을 수 없습니다.');
+      throw new Error("플레이어를 찾을 수 없습니다.");
     }
 
     await this.playerService.deathVote(player.id, deathVote);
@@ -447,10 +445,10 @@ export class GameService {
   async doctorVote(chatId: string, vote: string) {
     const game = await this.gameRepository.findOne({
       where: { chatId: chatId, phase: GamePhase.CLOSE_STATEMENT },
-      relations: ['players'],
+      relations: ["players"],
     });
     if (!game) {
-      throw new Error('현재 투표 중이지 않습니다.');
+      throw new Error("현재 투표 중이지 않습니다.");
     }
 
     await this.gameRepository.update(game.id, {
@@ -461,10 +459,10 @@ export class GameService {
   async mafiaVote(chatId: string, vote: string) {
     const game = await this.gameRepository.findOne({
       where: { chatId: chatId, phase: GamePhase.CLOSE_STATEMENT },
-      relations: ['players'],
+      relations: ["players"],
     });
     if (!game) {
-      throw new Error('현재 투표 중이지 않습니다.');
+      throw new Error("현재 투표 중이지 않습니다.");
     }
 
     await this.gameRepository.update(game.id, {
