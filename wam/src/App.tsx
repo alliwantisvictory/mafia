@@ -11,6 +11,8 @@ import MafiaVote from './pages/vote/MafiaVote'
 import DoctorVote from './pages/vote/DoctorVote'
 import PoliceVote from './pages/vote/PoliceVote'
 import Role from './pages/Role/Role'
+import Police from './pages/Police/Police'
+import RoleMafia from './pages/RoleMafia/RoleMafia'
 
 function App() {
   const wamName = useMemo(() => getWamData('wamName'), [])
@@ -28,9 +30,13 @@ function App() {
         return <DoctorVote />
       case 'POLICE_VOTE':
         return <PoliceVote />
+      case 'POLICE_RESULT':
+        return <Police />
       case 'ROLE':
         return <Role />
-      case "ERROR":
+      case 'ROLE_MAFIA':
+        return <RoleMafia />
+      case 'ERROR':
         return <Error />
     }
   }
