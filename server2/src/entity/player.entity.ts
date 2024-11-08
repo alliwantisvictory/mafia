@@ -16,11 +16,11 @@ export class PlayerEntity {
   @Column({ type: "varchar" })
   callerId: string;
 
-  // @Column({ type: "varchar" })
-  // username: string;
+  @Column({ type: "varchar" })
+  username: string;
 
-  // @Column({ type: "varchar" })
-  // profileImgUrl: string;
+  @Column({ type: "varchar" })
+  profileUrl: string;
 
   @Column({ type: "enum", enum: PlayerRole })
   role: PlayerRole;
