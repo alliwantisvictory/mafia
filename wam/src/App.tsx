@@ -30,7 +30,7 @@ function App() {
         return <PoliceVote />
       case 'ROLE':
         return <Role />
-      case "ERROR":
+      case 'ERROR':
         return <Error />
     }
   }
