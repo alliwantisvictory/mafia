@@ -1,5 +1,5 @@
-import * as crypto from "crypto";
-import axios from "axios";
+import * as crypto from 'crypto';
+import axios from 'axios';
 
 // 채널 토큰을 캐싱하기 위한 Map
 const channelTokenMap = new Map<string, [string, string, number]>();
@@ -25,12 +25,12 @@ export async function requestIssueToken(
   channelId?: string
 ): Promise<[string, string, number]> {
   const body = {
-    method: "issueToken",
+    method: 'issueToken',
     params: { secret: process.env.APP_SECRET, channelId },
   };
 
-  const headers = { "Content-Type": "application/json" };
-  const response = await axios.put(process.env.APPSTORE_URL ?? "", body, {
+  const headers = { 'Content-Type': 'application/json' };
+  const response = await axios.put(process.env.APPSTORE_URL ?? '', body, {
     headers,
   });
 
@@ -45,24 +45,24 @@ export async function requestIssueToken(
 // Command 등록 함수
 export async function registerCommand(accessToken: string) {
   const body = {
-    method: "registerCommands",
+    method: 'registerCommands',
     params: {
       appId: process.env.APP_ID,
       commands: [
         {
-          name: "tutorial",
-          scope: "desk",
-          description: "This is a desk command of mafia",
-          actionFunctionName: "tutorial",
-          alfMode: "disable",
+          name: 'tutorial',
+          scope: 'desk',
+          description: 'This is a desk command of mafia',
+          actionFunctionName: 'tutorial',
+          alfMode: 'disable',
           enabledByDefault: true,
         },
         {
-          name: "mafia",
-          scope: "desk",
+          name: 'mafia',
+          scope: 'desk',
           description: "Let's start a mafia game",
-          actionFunctionName: "mafia",
-          alfMode: "disable",
+          actionFunctionName: 'mafia',
+          alfMode: 'disable',
           enableByDefault: true,
         },
         {
@@ -78,15 +78,15 @@ export async function registerCommand(accessToken: string) {
   };
 
   const headers = {
-    "x-access-token": accessToken,
-    "Content-Type": "application/json",
+    'x-access-token': accessToken,
+    'Content-Type': 'application/json',
   };
-  const response = await axios.put(process.env.APPSTORE_URL ?? "", body, {
+  const response = await axios.put(process.env.APPSTORE_URL ?? '', body, {
     headers,
   });
 
   if (response.data.error) {
-    throw new Error("register command error");
+    throw new Error('register command error');
   }
 }
 
@@ -100,13 +100,13 @@ export async function sendAsBot(
   botName?: string
 ) {
   const body = {
-    method: "writeGroupMessage",
+    method: 'writeGroupMessage',
     params: {
       channelId,
       groupId,
       rootMessageId,
       broadcast,
-      dto: { plainText: message ?? "봇이 만들었음", botName: botName ?? "bot" },
+      dto: { plainText: message ?? '봇이 만들었음', botName: botName ?? 'bot' },
     },
   };
 
@@ -114,22 +114,22 @@ export async function sendAsBot(
 
   const [accessToken] = await getChannelToken(channelId);
   const headers = {
-    "x-access-token": accessToken,
-    "Content-Type": "application/json",
+    'x-access-token': accessToken,
+    'Content-Type': 'application/json',
   };
 
-  const response = await axios.put(process.env.APPSTORE_URL ?? "", body, {
+  const response = await axios.put(process.env.APPSTORE_URL ?? '', body, {
     headers,
   });
 
   if (response.data.error) {
-    throw new Error("send as bot error");
+    throw new Error('send as bot error');
   }
 }
 
 export function tutorial(wamName: string, callerId: string, params: any) {
   const wamArgs: { [key: string]: any } = {
-    message: "튜토리얼 메시지입니다.",
+    message: '튜토리얼 메시지입니다.',
     managerId: callerId,
   };
 
@@ -142,7 +142,7 @@ export function tutorial(wamName: string, callerId: string, params: any) {
 
   return {
     result: {
-      type: "wam",
+      type: 'wam',
       attributes: {
         appId: process.env.APP_ID,
         name: wamName,
@@ -155,11 +155,35 @@ export function tutorial(wamName: string, callerId: string, params: any) {
 // 서명 검증 함수
 export function verification(x_signature: string, body: string): boolean {
   const key = crypto.createSecretKey(
-    Buffer.from(process.env.SIGNING_KEY ?? "", "hex")
+    Buffer.from(process.env.SIGNING_KEY ?? '', 'hex')
   );
-  const mac = crypto.createHmac("sha256", key);
-  mac.update(body, "utf8");
-  return mac.digest("base64") === x_signature;
+  const mac = crypto.createHmac('sha256', key);
+  mac.update(body, 'utf8');
+  return mac.digest('base64') === x_signature;
+}
+
+export function openWam(
+  wamName: string,
+  wamArgs: { [key: string]: any },
+  params: any
+) {
+  if (params.trigger.attributes) {
+    this.defaultWamArgs.forEach((k) => {
+      if (params.trigger.attributes[k])
+        wamArgs[k] = params.trigger.attributes[k];
+    });
+  }
+
+  return {
+    result: {
+      type: 'wam',
+      attributes: {
+        appId: process.env.APP_ID,
+        name: wamName,
+        wamArgs,
+      },
+    },
+  };
 }
 
 export function openWam(

@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { ParamsTokenFactory } from "@nestjs/core/pipes";
 import { InjectRepository } from "@nestjs/typeorm";
 import { openWam } from "src/common/utils/utils";
 import { GameEntity } from "src/entity/game.entity";
@@ -25,5 +24,17 @@ export class PlayerService {
       role: player.role,
     };
     return openWam("wam_name", args, params);
+  }
+
+  async vote(id: string, vote: string) {
+    await this.playerRepository.update({ id }, { vote });
+  }
+
+  async deathVote(id: string, deathVote: boolean) {
+    await this.playerRepository.update({ id }, { deathVote });
+  }
+
+  async kill(id: string) {
+    await this.playerRepository.update({ id }, { isAlive: false });
   }
 }
