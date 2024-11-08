@@ -35,14 +35,6 @@ const Vote = ({ color }: Props) => {
           })
           window.ChannelIOWam.close()
           break
-        case 'DEATH_VOTE':
-          await callFunction(appId, 'deathVote', {
-            input: {
-              vote: selected,
-            },
-          })
-          window.ChannelIOWam.close()
-          break
         case 'DOCTOR_VOTE':
           await callFunction(appId, 'doctorVote', {
             input: {

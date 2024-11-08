@@ -1,7 +1,7 @@
 import { VStack } from '@channel.io/bezier-react'
 import * as Styled from './Vote.styled'
-import { useEffect, useState } from 'react'
-import { setSize } from '../../utils/wam'
+import { useEffect, useMemo, useState } from 'react'
+import { callFunction, getWamData, setSize } from '../../utils/wam'
 import styled from 'styled-components'
 import Yes from '/src/assets/images/yes.png'
 import No from '/src/assets/images/no.png'
@@ -14,6 +14,16 @@ const DeathVote = () => {
   }, [])
 
   const [selected, setSelected] = useState<'live' | 'die'>()
+
+  const appId = useMemo(() => getWamData('appId') ?? '', [])
+  const handleVote = async () => {
+    await callFunction(appId, 'deathVote', {
+      input: {
+        vote: selected === 'live' ? false : true,
+      },
+    })
+    window.ChannelIOWam.close()
+  }
 
   return (
     <VStack
@@ -38,7 +48,12 @@ const DeathVote = () => {
           <Text>죽인다</Text>
         </VoteButton>
       </Container>
-      <Styled.VoteButton color="red">확인</Styled.VoteButton>
+      <Styled.VoteButton
+        color="red"
+        onClick={handleVote}
+      >
+        확인
+      </Styled.VoteButton>
     </VStack>
   )
 }
