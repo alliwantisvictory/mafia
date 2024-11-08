@@ -65,6 +65,14 @@ export async function registerCommand(accessToken: string) {
           alfMode: "disable",
           enableByDefault: true,
         },
+        {
+          name: "role",
+          scope: "desk",
+          description: "자신의 역할을 확인할 수 있어요.",
+          actionFunctionName: "role",
+          alfMode: "disable",
+          enableByDefault: true,
+        },
       ],
     },
   };
@@ -152,4 +160,28 @@ export function verification(x_signature: string, body: string): boolean {
   const mac = crypto.createHmac("sha256", key);
   mac.update(body, "utf8");
   return mac.digest("base64") === x_signature;
+}
+
+export function openWam(
+  wamName: string,
+  wamArgs: { [key: string]: any },
+  params: any
+) {
+  if (params.trigger.attributes) {
+    this.defaultWamArgs.forEach((k) => {
+      if (params.trigger.attributes[k])
+        wamArgs[k] = params.trigger.attributes[k];
+    });
+  }
+
+  return {
+    result: {
+      type: "wam",
+      attributes: {
+        appId: process.env.APP_ID,
+        name: wamName,
+        wamArgs,
+      },
+    },
+  };
 }

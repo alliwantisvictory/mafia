@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
 import { GameStatus } from "src/common/enum/game-status-enum";
-import { getChannelToken, sendAsBot } from "src/common/utils/utils";
+import { getChannelToken, sendAsBot, tutorial } from "src/common/utils/utils";
 import { GameEntity } from "src/entity/game.entity";
 import { PlayerService } from "src/player/player.service";
 import { Repository } from "typeorm";

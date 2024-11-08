@@ -11,11 +11,15 @@ import {
 import { AppService } from "./app.service";
 import { Response } from "express";
 import { GameService } from "./game/game.service";
+import { PlayerService } from "./player/player.service";
 import { sendAsBot, tutorial, verification } from "./common/utils/utils";
 
 @Controller()
 export class AppController {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly playerService: PlayerService
+  ) {}
 
   @Get()
   async getHello() {
@@ -57,6 +61,8 @@ export class AppController {
           params.input.rootMessageId
         );
         return res.json({ result: {} });
+      case "role":
+        return res.json(this.playerService.showJob(context.caller.id, params));
       default:
         return res.status(HttpStatus.BAD_REQUEST).send("Unknown method");
     }
