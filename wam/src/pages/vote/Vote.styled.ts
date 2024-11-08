@@ -1,4 +1,11 @@
 import styled from 'styled-components'
+import { ColorType } from './components/Vote'
+
+export const CancelIconWrapper = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+`
 
 export const MafiaText = styled.span`
   font-size: 24px;
@@ -32,13 +39,14 @@ export const VoteImage = styled.div`
   position: relative;
 `
 
-export const SelectedIcon = styled.div`
+export const SelectedIcon = styled.div<{ color: ColorType }>`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(190, 58, 58, 0.8);
+  background: ${({ color }) =>
+    color === 'red' ? 'rgba(190, 58, 58, 0.8)' : 'rgba(83, 124, 227, 0.8)'};
   border-radius: 80%;
   z-index: 10;
   display: flex;
@@ -63,10 +71,10 @@ export const VoteItemColumn = styled.div`
   gap: 40px;
 `
 
-export const VoteButton = styled.button`
+export const VoteButton = styled.button<{ color: ColorType }>`
   width: 68px;
   height: 32px;
-  background-color: #be3a3a;
+  background-color: ${({ color }) => (color === 'red' ? '#be3a3a' : '#537ce7')};
   border-radius: 10px;
   border: none;
   color: white;

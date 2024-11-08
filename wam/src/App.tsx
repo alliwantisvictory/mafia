@@ -4,10 +4,9 @@ import { AppProvider, type ThemeName } from '@channel.io/bezier-react'
 import { isMobile } from './utils/userAgent'
 import { getWamData } from './utils/wam'
 import Send from './pages/Send'
-import MafiaVote from './pages/MafiaVote/MafiaVote'
+import MafiaVote from './pages/vote/MafiaVote'
 
 function App() {
-  return <MafiaVote />
   const [theme, setTheme] = useState<ThemeName>('light')
   const wamName = useMemo(() => getWamData('wamName'), [])
 
@@ -28,7 +27,7 @@ function App() {
   return (
     <AppProvider themeName={theme}>
       <div style={{ padding: isMobile() ? '16px' : '0 24px 24px 24px' }}>
-        {/* {renderWam()} */}
+        {renderWam()}
       </div>
     </AppProvider>
   )
