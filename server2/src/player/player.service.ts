@@ -13,6 +13,7 @@ export class PlayerService {
 
   async createPlayer(callerId: string, game: GameEntity) {
     const player = this.playerRepository.create({ callerId, game });
+    console.log(player);
     await this.playerRepository.save(player);
   }
 }

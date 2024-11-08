@@ -16,13 +16,19 @@ export class PlayerEntity {
   @Column({ type: "varchar" })
   callerId: string;
 
+  // @Column({ type: "varchar" })
+  // username: string;
+
+  // @Column({ type: "varchar" })
+  // profileImgUrl: string;
+
   @Column({ type: "enum", enum: PlayerRole })
   role: PlayerRole;
 
   @Column({ type: "tinyint", default: true })
   isAlive: boolean;
 
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: "gameId" })
   @ManyToOne(() => GameEntity, (gameEntity) => gameEntity.players, {
     onDelete: "CASCADE",
   })

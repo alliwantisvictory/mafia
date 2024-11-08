@@ -35,8 +35,8 @@ export class AppController {
     const { method, context, params } = body;
     const { caller, channel } = context;
 
-    console.log(body);
-    console.log(context);
+    console.log("body!!!", body);
+    console.log("context!!!", context);
 
     switch (method) {
       case "tutorial":
@@ -53,6 +53,16 @@ export class AppController {
           context.channel.id,
           params.chat.id,
           false,
+          params.chat.id,
+          context.caller.id,
+          params.input.rootMessageId
+        );
+      case "join":
+        await this.gameService.joinMafiaGame(
+          context.channel.id,
+          params.chat.id,
+          false,
+          params.chat.id,
           context.caller.id,
           params.input.rootMessageId
         );

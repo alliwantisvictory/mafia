@@ -65,6 +65,14 @@ export async function registerCommand(accessToken: string) {
           alfMode: "disable",
           enableByDefault: true,
         },
+        {
+          name: "join",
+          scope: "desk",
+          description: "join a mafia game",
+          actionFunctionName: "join",
+          alfMode: "disable",
+          enableByDefault: true,
+        },
       ],
     },
   };
@@ -117,6 +125,61 @@ export async function sendAsBot(
   if (response.data.error) {
     throw new Error("send as bot error");
   }
+}
+
+export async function getUserInfo(channelId: string, userId: string) {
+  const body = {
+    method: "getUser",
+    params: {
+      channelId,
+      userId,
+    },
+  };
+
+  const [accessToken] = await getChannelToken(channelId);
+  const headers = {
+    "x-access-token": accessToken,
+    "Content-Type": "application/json",
+  };
+
+  const response = await axios.put(process.env.APPSTORE_URL ?? "", body, {
+    headers,
+  });
+
+  if (response.data.error) {
+    throw new Error("유저 정보 가져오는데 실패했습니다.");
+  }
+
+  return response;
+}
+
+export async function getManagerInfo(channelId: string, managerId: string) {
+  const body = {
+    method: "getManager",
+    params: {
+      channelId,
+      managerId,
+    },
+  };
+
+  console.log(body);
+
+  const [accessToken] = await getChannelToken(channelId);
+  const headers = {
+    "x-access-token": accessToken,
+    "Content-Type": "application/json",
+  };
+
+  const response = await axios.put(process.env.APPSTORE_URL ?? "", body, {
+    headers,
+  });
+
+  if (response.data.error) {
+    console.log(response.data.error);
+    throw new Error("매니저 정보 가져오는데 실패했습니다.");
+  }
+
+  return response;
 }
 
 export function tutorial(wamName: string, callerId: string, params: any) {
