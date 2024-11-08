@@ -1,0 +1,56 @@
+// app.controller.ts
+import {
+  Controller,
+  Put,
+  Body,
+  Headers,
+  HttpStatus,
+  Res,
+  Get,
+} from '@nestjs/common';
+import { AppService } from './app.service';
+import { Response } from 'express';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  async getHello() {
+    return 'hello!';
+  }
+
+  @Put('/functions')
+  async handleFunction(
+    @Body() body: any,
+    @Headers('x-signature') signature: string,
+    @Res() res: Response,
+  ) {
+    if (
+      !signature ||
+      !this.appService.verification(signature, JSON.stringify(body))
+    ) {
+      return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
+    }
+
+    const { method, context, params } = body;
+    const { caller, channel } = context;
+
+    switch (method) {
+      case 'tutorial':
+        return res.json(
+          this.appService.tutorial('wam_name', caller.id, params),
+        );
+      case 'sendAsBot':
+        await this.appService.sendAsBot(
+          channel.id,
+          params.input.groupId,
+          params.input.broadcast,
+          params.input.rootMessageId,
+        );
+        return res.json({ result: {} });
+      default:
+        return res.status(HttpStatus.BAD_REQUEST).send('Unknown method');
+    }
+  }
+}
