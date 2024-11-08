@@ -76,7 +76,6 @@ export const VoteItemWrapper = styled.div`
   align-items: center;
   justify-content: center;
   gap: 40px;
-  flex-direction: column;
   flex-wrap: wrap;
 `
 

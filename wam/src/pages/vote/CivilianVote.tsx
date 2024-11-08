@@ -24,7 +24,6 @@ const CivilianVote = () => {
         누가 <Styled.Text color="red">마피아 </Styled.Text>일까요?
       </Styled.TitleText>
       <Vote color="red" />
-      <Styled.VoteButton color="red">확인</Styled.VoteButton>
     </Styled.Wrapper>
   )
 }
