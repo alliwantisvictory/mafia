@@ -19,7 +19,6 @@ export class PlayerService {
     await this.playerRepository.save(player);
   }
 
-
   async setJob(callerId: string, role: PlayerRole) {
     await this.playerRepository.update({ callerId }, { role });
   }
