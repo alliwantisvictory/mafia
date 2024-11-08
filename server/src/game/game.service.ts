@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import axios from 'axios';
-import { GamePhase } from 'src/common/enum/game-phase-enum';
-import { GameStatus } from 'src/common/enum/game-status-enum';
-import { getChannelToken, sendAsBot } from 'src/common/utils/utils';
-import { GameEntity } from 'src/entity/game.entity';
-import { PlayerService } from 'src/player/player.service';
-import { Repository } from 'typeorm';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import axios from "axios";
+import { GamePhase } from "src/common/enum/game-phase-enum";
+import { GameStatus } from "src/common/enum/game-status-enum";
+import { getChannelToken, sendAsBot } from "src/common/utils/utils";
+import { GameEntity } from "src/entity/game.entity";
+import { PlayerService } from "src/player/player.service";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class GameService {
@@ -15,21 +15,21 @@ export class GameService {
     private readonly gameRepository: Repository<GameEntity>,
     private readonly playerService: PlayerService
   ) {}
-  private readonly createMafiaGameMsg = '마피아 게임을 생성합니다!';
+  private readonly createMafiaGameMsg = "마피아 게임을 생성합니다!";
   private readonly startMafiaGameMsg =
-    '마피아 게임을 시작합니다! /job을 통해 자신의 역할을 확인하세요.';
+    "마피아 게임을 시작합니다! /job을 통해 자신의 역할을 확인하세요.";
   private readonly dayMafiaGameMsg =
-    '낮이 되었습니다. 자유롭게 이야기하며 마피아를 찾아보세요.';
-  private readonly nightMafiaGameMsg = '밤이 되었습니다.';
+    "낮이 되었습니다. 자유롭게 이야기하며 마피아를 찾아보세요.";
+  private readonly nightMafiaGameMsg = "밤이 되었습니다.";
   private readonly voteMafiaGameMsg =
-    '투표를 진행합니다. /vote를 통해 마피아로 의심되는 사람을 지목해주세요.';
+    "투표를 진행합니다. /vote를 통해 마피아로 의심되는 사람을 지목해주세요.";
   private readonly closeStatementMafiaGameMsg =
-    '님이 마피아로 지목되었습니다. 20초간 최종 변론을 해주세요.';
+    "님이 마피아로 지목되었습니다. 20초간 최종 변론을 해주세요.";
   private readonly finalVoteMafiaGameMsg =
-    '지금부터 20초 간 최종 투표를 진행합니다.';
-  private readonly deathMsg = '님이 처형되었습니다.';
-  private readonly liveMsg = '님이 생존하였습니다.';
-  private readonly botName = 'Mafia Bot';
+    "지금부터 20초 간 최종 투표를 진행합니다.";
+  private readonly deathMsg = "님이 처형되었습니다.";
+  private readonly liveMsg = "님이 생존하였습니다.";
+  private readonly botName = "Mafia Bot";
 
   async createMafiaGame(
     channelId: string,
@@ -44,7 +44,7 @@ export class GameService {
     });
 
     if (isAlreadyRunning.length) {
-      throw new Error('이미 게임 중입니다.');
+      throw new Error("이미 게임 중입니다.");
     }
 
     const newGame = this.gameRepository.create({ chatId });
@@ -75,7 +75,7 @@ export class GameService {
     });
 
     if (!readyGame) {
-      throw new Error('게임 준비가 되지 않았습니다.');
+      throw new Error("게임 준비가 되지 않았습니다.");
     } else if (readyGame.players.length < 6) {
       throw new Error(
         `아직 참가자가 부족합니다. (현재 참가자 수: ${readyGame.players.length}명)`
@@ -198,16 +198,16 @@ export class GameService {
     });
 
     if (!game) {
-      throw new Error('게임이 진행 중이지 않습니다.');
+      throw new Error("게임이 진행 중이지 않습니다.");
     }
 
-    let phase = '';
+    let phase = "";
     if (game.phase === GamePhase.VOTE) {
-      phase = 'CIVILIAN_VOTE';
+      phase = "CIVILIAN_VOTE";
     } else if (game.phase === GamePhase.CLOSE_STATEMENT) {
-      phase = 'DEATH_VOTE';
+      phase = "DEATH_VOTE";
     } else {
-      throw new Error('현재 투표를 할 수 없는 상태입니다.');
+      throw new Error("현재 투표를 할 수 없는 상태입니다.");
     }
 
     return { players: game.players, phase };
@@ -216,15 +216,15 @@ export class GameService {
   async civilianVote(chatId: string, userId: string, vote: string) {
     const game = await this.gameRepository.findOne({
       where: { chatId: chatId, phase: GamePhase.VOTE },
-      relations: ['players'],
+      relations: ["players"],
     });
     if (!game) {
-      throw new Error('현재 투표 중이지 않습니다.');
+      throw new Error("현재 투표 중이지 않습니다.");
     }
 
     const player = game.players.find((player) => player.callerId === userId);
     if (!player) {
-      throw new Error('플레이어를 찾을 수 없습니다.');
+      throw new Error("플레이어를 찾을 수 없습니다.");
     }
 
     await this.playerService.vote(player.id, vote);
@@ -233,15 +233,15 @@ export class GameService {
   async deathVote(chatId: string, userId: string, deathVote: boolean) {
     const game = await this.gameRepository.findOne({
       where: { chatId: chatId, phase: GamePhase.CLOSE_STATEMENT },
-      relations: ['players'],
+      relations: ["players"],
     });
     if (!game) {
-      throw new Error('현재 투표 중이지 않습니다.');
+      throw new Error("현재 투표 중이지 않습니다.");
     }
 
     const player = game.players.find((player) => player.callerId === userId);
     if (!player) {
-      throw new Error('플레이어를 찾을 수 없습니다.');
+      throw new Error("플레이어를 찾을 수 없습니다.");
     }
 
     await this.playerService.deathVote(player.id, deathVote);

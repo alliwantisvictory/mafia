@@ -7,34 +7,38 @@ import {
   HttpStatus,
   Res,
   Get,
-} from '@nestjs/common';
-import { AppService } from './app.service';
-import { Response } from 'express';
-import { GameService } from './game/game.service';
+} from "@nestjs/common";
+import { AppService } from "./app.service";
+import { Response } from "express";
+import { GameService } from "./game/game.service";
+import { PlayerService } from "./player/player.service";
 import {
   openWam,
   sendAsBot,
   tutorial,
   verification,
-} from './common/utils/utils';
+} from "./common/utils/utils";
 
 @Controller()
 export class AppController {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly playerService: PlayerService
+  ) {}
 
   @Get()
   async getHello() {
-    return 'hello!';
+    return "hello!";
   }
 
-  @Put('/functions')
+  @Put("/functions")
   async handleFunction(
     @Body() body: any,
-    @Headers('x-signature') signature: string,
+    @Headers("x-signature") signature: string,
     @Res() res: Response
   ) {
     if (!signature || !verification(signature, JSON.stringify(body))) {
-      return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
+      return res.status(HttpStatus.UNAUTHORIZED).send("Unauthorized");
     }
 
     const { method, context, params } = body;
@@ -44,9 +48,9 @@ export class AppController {
     console.log(context);
 
     switch (method) {
-      case 'tutorial':
-        return res.json(tutorial('wam_name', caller.id, params));
-      case 'sendAsBot':
+      case "tutorial":
+        return res.json(tutorial("wam_name", caller.id, params));
+      case "sendAsBot":
         await sendAsBot(
           channel.id,
           params.input.groupId,
@@ -54,7 +58,7 @@ export class AppController {
           params.input.rootMessageId
         );
         break;
-      case 'mafia':
+      case "mafia":
         await this.gameService.createMafiaGame(
           context.channel.id,
           params.chat.id,
@@ -63,7 +67,9 @@ export class AppController {
           params.input.rootMessageId
         );
         return res.json({ result: {} });
-      case 'start':
+      case "role":
+        return res.json(this.playerService.showJob(context.caller.id, params));
+      case "start":
         await sendAsBot(
           channel.id,
           params.input.groupId,
@@ -71,19 +77,19 @@ export class AppController {
           params.input.rootMessageId
         );
         break;
-      case 'vote':
+      case "vote":
         const { phase, players } = await this.gameService.getPlayers(
           params.chat.id
         );
         return res.json(openWam(phase, { players }, params));
-      case 'civilianVote':
+      case "civilianVote":
         await this.gameService.civilianVote(
           params.chat.id,
           context.caller.id,
           params.input.vote
         );
         break;
-      case 'deathVote':
+      case "deathVote":
         await this.gameService.deathVote(
           params.chat.id,
           context.caller.id,
@@ -91,7 +97,7 @@ export class AppController {
         );
         break;
       default:
-        return res.status(HttpStatus.BAD_REQUEST).send('Unknown method');
+        return res.status(HttpStatus.BAD_REQUEST).send("Unknown method");
     }
   }
 }
