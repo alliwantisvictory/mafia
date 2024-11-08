@@ -1,53 +1,36 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import * as Styled from '../Vote.styled'
 import Hamster from '/src/assets/images/hamster.png'
 import Confirm from '/src/assets/images/confirm.png'
+import { getWamData } from '../../../utils/wam'
 
 export type ColorType = 'red' | 'blue'
+
+interface Player {
+  id: string
+  callerId: string
+}
 
 interface Props {
   color: ColorType
 }
 
 const Vote = ({ color }: Props) => {
-  const [selected, setSelected] = useState<number>()
+  const players: Player[] = useMemo(
+    () => JSON.parse(getWamData('players') ?? '[]'),
+    []
+  )
+  const [selected, setSelected] = useState<string>()
 
   return (
     <Styled.VoteItemWrapper>
-      <Styled.VoteItemColumn>
+      {players.map((player) => (
         <VoteItem
-          selected={selected === 0}
-          onClick={() => setSelected(0)}
+          selected={selected === player.id}
+          onClick={() => setSelected(player.id)}
           color={color}
         />
-        <VoteItem
-          selected={selected === 1}
-          onClick={() => setSelected(1)}
-          color={color}
-        />
-        <VoteItem
-          selected={selected === 2}
-          onClick={() => setSelected(2)}
-          color={color}
-        />
-      </Styled.VoteItemColumn>
-      <Styled.VoteItemColumn>
-        <VoteItem
-          selected={selected === 4}
-          onClick={() => setSelected(4)}
-          color={color}
-        />
-        <VoteItem
-          selected={selected === 5}
-          onClick={() => setSelected(5)}
-          color={color}
-        />
-        <VoteItem
-          selected={selected === 6}
-          onClick={() => setSelected(6)}
-          color={color}
-        />
-      </Styled.VoteItemColumn>
+      ))}
     </Styled.VoteItemWrapper>
   )
 }

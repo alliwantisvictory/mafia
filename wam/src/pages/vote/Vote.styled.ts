@@ -77,10 +77,7 @@ export const VoteItemWrapper = styled.div`
   justify-content: center;
   gap: 40px;
   flex-direction: column;
-`
-export const VoteItemColumn = styled.div`
-  display: flex;
-  gap: 40px;
+  flex-wrap: wrap;
 `
 
 export const VoteButton = styled.button<{ color: ColorType }>`
