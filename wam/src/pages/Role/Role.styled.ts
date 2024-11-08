@@ -1,15 +1,5 @@
 import styled from 'styled-components'
 
-export const CenterTextWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-
-  width: 400px;
-  height: 412px;
-`
-
 export const subtitle = styled.p`
   font-size: 14px;
   font-weight: 500;
