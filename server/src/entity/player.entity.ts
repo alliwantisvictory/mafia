@@ -1,30 +1,36 @@
-import { PlayerRole } from "src/common/enum/player-role.enum";
+import { PlayerRole } from 'src/common/enum/player-role.enum';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
-} from "typeorm";
-import { GameEntity } from "./game.entity";
+} from 'typeorm';
+import { GameEntity } from './game.entity';
 
-@Entity("player")
+@Entity('player')
 export class PlayerEntity {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ type: "varchar" })
+  @Column({ type: 'varchar' })
   callerId: string;
 
-  @Column({ type: "enum", enum: PlayerRole })
+  @Column({ type: 'enum', enum: PlayerRole })
   role: PlayerRole;
 
-  @Column({ type: "tinyint", default: true })
+  @Column({ type: 'tinyint', default: true })
   isAlive: boolean;
 
-  @JoinColumn({ name: "userId" })
+  @Column({ type: 'varchar', nullable: true })
+  vote: string;
+
+  @Column({ type: 'bool', default: false })
+  deathVote: boolean;
+
+  @JoinColumn({ name: 'userId' })
   @ManyToOne(() => GameEntity, (gameEntity) => gameEntity.players, {
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   })
   game: GameEntity;
 }
