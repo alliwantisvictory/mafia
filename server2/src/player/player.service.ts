@@ -19,17 +19,14 @@ export class PlayerService {
     await this.playerRepository.save(player);
   }
 
+
   async setJob(callerId: string, role: PlayerRole) {
     await this.playerRepository.update({ callerId }, { role });
   }
 
-  async showJob(callerId: string, params: any) {
+  async getJob(callerId: string) {
     const player = await this.playerRepository.findOne({ where: { callerId } });
-    const args = {
-      wamName: 'ROLE',
-      role: player.role,
-    };
-    return openWam('wam_name', args, params);
+    return player.role;
   }
 
   async vote(id: string, vote: string) {
