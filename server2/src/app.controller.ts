@@ -1,3 +1,4 @@
+import { PlayerService } from "src/player/player.service";
 // app.controller.ts
 import {
   Controller,
@@ -11,11 +12,19 @@ import {
 import { AppService } from "./app.service";
 import { Response } from "express";
 import { GameService } from "./game/game.service";
-import { sendAsBot, tutorial, verification } from "./common/utils/utils";
+import {
+  openWam,
+  sendAsBot,
+  tutorial,
+  verification,
+} from "./common/utils/utils";
 
 @Controller()
 export class AppController {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly playerService: PlayerService
+  ) {}
 
   @Get()
   async getHello() {
@@ -67,6 +76,37 @@ export class AppController {
           params.input.rootMessageId
         );
         return res.json({ result: {} });
+      case "role":
+        return res.json(this.playerService.showJob(context.caller.id, params));
+      case "start":
+        await this.gameService.startGame(
+          context.channel.id,
+          params.chat.id,
+          false,
+          params.chat.id,
+          context.caller.id,
+          params.input.rootMessageId
+        );
+        break;
+      case "vote":
+        const { phase, players } = await this.gameService.getPlayers(
+          params.chat.id
+        );
+        return res.json(openWam(phase, { players }, params));
+      case "civilianVote":
+        await this.gameService.civilianVote(
+          params.chat.id,
+          context.caller.id,
+          params.input.vote
+        );
+        break;
+      case "deathVote":
+        await this.gameService.deathVote(
+          params.chat.id,
+          context.caller.id,
+          params.input.deathVote
+        );
+        break;
       default:
         return res.status(HttpStatus.BAD_REQUEST).send("Unknown method");
     }

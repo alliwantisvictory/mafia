@@ -73,6 +73,30 @@ export async function registerCommand(accessToken: string) {
           alfMode: "disable",
           enableByDefault: true,
         },
+        {
+          name: "role",
+          scope: "desk",
+          description: "join a mafia game",
+          actionFunctionName: "role",
+          alfMode: "disable",
+          enableByDefault: true,
+        },
+        {
+          name: "start",
+          scope: "desk",
+          description: "join a mafia game",
+          actionFunctionName: "start",
+          alfMode: "disable",
+          enableByDefault: true,
+        },
+        {
+          name: "vote",
+          scope: "desk",
+          description: "join a mafia game",
+          actionFunctionName: "vote",
+          alfMode: "disable",
+          enableByDefault: true,
+        },
       ],
     },
   };
@@ -215,4 +239,28 @@ export function verification(x_signature: string, body: string): boolean {
   const mac = crypto.createHmac("sha256", key);
   mac.update(body, "utf8");
   return mac.digest("base64") === x_signature;
+}
+
+export function openWam(
+  wamName: string,
+  wamArgs: { [key: string]: any },
+  params: any
+) {
+  if (params.trigger.attributes) {
+    this.defaultWamArgs.forEach((k) => {
+      if (params.trigger.attributes[k])
+        wamArgs[k] = params.trigger.attributes[k];
+    });
+  }
+
+  return {
+    result: {
+      type: "wam",
+      attributes: {
+        appId: process.env.APP_ID,
+        name: wamName,
+        wamArgs,
+      },
+    },
+  };
 }

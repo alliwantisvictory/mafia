@@ -28,6 +28,12 @@ export class PlayerEntity {
   @Column({ type: "tinyint", default: true })
   isAlive: boolean;
 
+  @Column({ type: "varchar", nullable: true })
+  vote: string;
+
+  @Column({ type: "bool", default: false })
+  deathVote: boolean;
+
   @JoinColumn({ name: "gameId" })
   @ManyToOne(() => GameEntity, (gameEntity) => gameEntity.players, {
     onDelete: "CASCADE",
