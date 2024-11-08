@@ -118,6 +118,22 @@ export class AppController {
       case 'mafiaVote':
         await this.gameService.mafiaVote(params.chat.id, params.input.vote);
         break;
+      case 'execute':
+        const { players: executePlayers } = await this.gameService.getPlayers(
+          params.chat.id
+        );
+        const foundRole = executePlayers.find(
+          (player) => player.callerId === context.caller.id
+        ).role;
+        const parsedRole =
+          foundRole === 'MAFIA'
+            ? 'MAFIA_VOTE'
+            : foundRole === 'DOCTOR'
+              ? 'DOCTOR_VOTE'
+              : 'POLICE_VOTE';
+        return res.json(
+          openWam(parsedRole, { players: executePlayers }, params)
+        );
       default:
         return res.status(HttpStatus.BAD_REQUEST).send('Unknown method');
     }

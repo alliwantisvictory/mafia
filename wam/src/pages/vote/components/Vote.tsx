@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import * as Styled from '../Vote.styled'
 import Confirm from '/src/assets/images/confirm.png'
 import { callFunction, getWamData } from '../../../utils/wam'
@@ -24,48 +24,45 @@ const Vote = ({ color }: Props) => {
   const players = useMemo<Player[]>(() => getWamData('players'), [])
   const [selected, setSelected] = useState<string>()
 
-  const handleSend = useCallback(
-    async (name: string): Promise<void> => {
-      switch (name) {
-        case 'CIVILIAN_VOTE':
-          await callFunction(appId, 'civilianVote', {
-            input: {
-              vote: selected,
-            },
-          })
-          window.ChannelIOWam.close()
-          break
-        case 'DOCTOR_VOTE':
-          await callFunction(appId, 'doctorVote', {
-            input: {
-              vote: selected,
-            },
-          })
-          window.ChannelIOWam.close()
-          break
-        case 'POLICE_VOTE':
-          await callFunction(appId, 'policeVote', {
-            input: {
-              vote: selected,
-            },
-          })
-          window.ChannelIOWam.close()
-          break
-        default:
-          // NOTE: should not reach here
-          console.error('Invalid message sender')
-      }
-    },
-    [appId, selected]
-  )
+  const handleSend = async () => {
+    switch (name) {
+      case 'CIVILIAN_VOTE':
+        await callFunction(appId, 'civilianVote', {
+          input: {
+            vote: selected,
+          },
+        })
+        window.ChannelIOWam.close()
+        break
+      case 'DOCTOR_VOTE':
+        await callFunction(appId, 'doctorVote', {
+          input: {
+            vote: selected,
+          },
+        })
+        window.ChannelIOWam.close()
+        break
+      case 'POLICE_VOTE':
+        await callFunction(appId, 'policeVote', {
+          input: {
+            vote: selected,
+          },
+        })
+        window.ChannelIOWam.close()
+        break
+      default:
+        // NOTE: should not reach here
+        console.error('Invalid message sender')
+    }
+  }
 
   return (
     <>
       <Styled.VoteItemWrapper>
         {players.map((player: Player) => (
           <VoteItem
-            selected={selected === player.id}
-            onClick={() => setSelected(player.id)}
+            selected={selected === player.callerId}
+            onClick={() => setSelected(player.callerId)}
             color={color}
             player={player}
           />
@@ -73,7 +70,7 @@ const Vote = ({ color }: Props) => {
       </Styled.VoteItemWrapper>
       <Styled.VoteButton
         color={color}
-        onClick={() => handleSend(name)}
+        onClick={handleSend}
       >
         확인
       </Styled.VoteButton>

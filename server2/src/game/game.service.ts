@@ -216,10 +216,8 @@ export class GameService {
       // 최종 변론
       const { players: closePlayers } = await this.getPlayers(chatId);
       const votes = closePlayers.map((player) => player.vote);
-      const voteCounts = votes.reduce((acc, vote) => {
-        if (!vote) {
-          return acc;
-        }
+      const filteredVotes = votes.filter((vote) => vote !== null);
+      const voteCounts = filteredVotes.reduce((acc, vote) => {
         acc[vote] = (acc[vote] || 0) + 1;
         return acc;
       }, {});
