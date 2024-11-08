@@ -9,10 +9,10 @@ import CivilianVote from './pages/vote/CivilianVote'
 import MafiaVote from './pages/vote/MafiaVote'
 import DoctorVote from './pages/vote/DoctorVote'
 import PoliceVote from './pages/vote/PoliceVote'
+import Role from './pages/Role/Role'
 
 function App() {
   const wamName = useMemo(() => getWamData('wamName'), [])
-
   const renderWam = () => {
     switch (wamName) {
       case 'wam_name':
@@ -27,6 +27,8 @@ function App() {
         return <DoctorVote />
       case 'POLICE_VOTE':
         return <PoliceVote />
+      case 'ROLE':
+        return <Role />
     }
   }
 
