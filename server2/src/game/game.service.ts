@@ -162,7 +162,14 @@ export class GameService {
       // 낮
       await this.gameRepository.update(readyGame.id, {
         phase: GamePhase.DAY,
+        doctorSelect: null,
+        mafiaSelect: null,
       });
+      await Promise.all(
+        readyGame.players.map((player) =>
+          this.playerService.resetVote(player.id)
+        )
+      );
       await sendAsBot(
         channelId,
         groupId,
@@ -305,7 +312,7 @@ export class GameService {
           groupId,
           broadcast,
           rootMessageId,
-          `지난 밤 ${playerSelectedByMafia}님이 총에 맞았으나, 근처에 있던 의사의 응급처치를 덕분에 목숨을 건졌습니다.`,
+          `지난 밤 ${playerSelectedByMafia}님이 총에 맞았으나, 근처에 있던 의사의 응급처치 덕분에 목숨을 건졌습니다.`,
           this.botName
         );
       } else {
