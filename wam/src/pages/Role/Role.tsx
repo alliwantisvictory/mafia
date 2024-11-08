@@ -14,7 +14,7 @@ function Role() {
     setSize(400, 436)
   }, [])
 
-  const role = useMemo(() => getWamData('role') ?? 'DOCTOR', [])
+  const role = useMemo(() => getWamData('role') ?? '', [])
 
   let roleName = ''
   let RoleHeading = Styled.secondaryHeading
@@ -41,7 +41,7 @@ function Role() {
       roleImageSrc = citizen
       break
     default:
-      roleName = '알 수 없는 역할'
+      roleName = '직업이 아직 부여되지 않았습니다.'
       break
   }
 

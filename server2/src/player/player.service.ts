@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { openWam } from "src/common/utils/utils";
 import { GameEntity } from "src/entity/game.entity";
 import { PlayerEntity } from "src/entity/player.entity";
 import { Repository } from "typeorm";
@@ -18,13 +17,9 @@ export class PlayerService {
     await this.playerRepository.save(player);
   }
 
-  async showJob(callerId: string, params: any) {
+  async getJob(callerId: string) {
     const player = await this.playerRepository.findOne({ where: { callerId } });
-    const args = {
-      wamName: "ROLE",
-      role: player.role,
-    };
-    return openWam("wam_name", args, params);
+    return player.role;
   }
 
   async vote(id: string, vote: string) {
