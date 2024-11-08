@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import * as Styled from '../Vote.styled'
-import Hamster from '/src/assets/images/hamster.png'
 import Confirm from '/src/assets/images/confirm.png'
 import { getWamData } from '../../../utils/wam'
 
@@ -9,6 +8,8 @@ export type ColorType = 'red' | 'blue'
 interface Player {
   id: string
   callerId: string
+  username: string
+  profileUrl: string
 }
 
 interface Props {
@@ -27,6 +28,7 @@ const Vote = ({ color }: Props) => {
           selected={selected === player.id}
           onClick={() => setSelected(player.id)}
           color={color}
+          player={player}
         />
       ))}
     </Styled.VoteItemWrapper>
@@ -39,13 +41,14 @@ interface VoteItemProps {
   selected: boolean
   onClick: () => void
   color: ColorType
+  player: Player
 }
 
-const VoteItem = ({ selected, onClick, color }: VoteItemProps) => {
+const VoteItem = ({ selected, onClick, color, player }: VoteItemProps) => {
   return (
     <Styled.VoteWrapper onClick={onClick}>
       <Styled.VoteImage>
-        <img src={Hamster} />
+        <img src={player.profileUrl} />
         {selected && (
           <Styled.SelectedIcon color={color}>
             <img
@@ -56,7 +59,7 @@ const VoteItem = ({ selected, onClick, color }: VoteItemProps) => {
           </Styled.SelectedIcon>
         )}
       </Styled.VoteImage>
-      <Styled.VoteName>원하진</Styled.VoteName>
+      <Styled.VoteName>{player.username}</Styled.VoteName>
     </Styled.VoteWrapper>
   )
 }
