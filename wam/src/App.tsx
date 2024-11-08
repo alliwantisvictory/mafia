@@ -3,6 +3,7 @@ import { AppProvider } from '@channel.io/bezier-react'
 
 import { isMobile } from './utils/userAgent'
 import { getWamData } from './utils/wam'
+import Error from './pages/Error/Error'
 import Send from './pages/Send'
 import DeathVote from './pages/vote/DeathVote'
 import CivilianVote from './pages/vote/CivilianVote'
@@ -29,6 +30,8 @@ function App() {
         return <PoliceVote />
       case 'ROLE':
         return <Role />
+      case "ERROR":
+        return <Error />
     }
   }
 
