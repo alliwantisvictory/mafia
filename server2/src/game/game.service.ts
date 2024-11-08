@@ -25,7 +25,7 @@ export class GameService {
   private readonly createMafiaGameMsg =
     '/join을 통해 마피아 게임에 참여해보세요!';
   private readonly startMafiaGameMsg =
-    "마피아 게임을 시작합니다! /role을 통해 자신의 역할을 확인하세요.";
+    '마피아 게임을 시작합니다! /role을 통해 자신의 역할을 확인하세요.';
   private readonly dayMafiaGameMsg =
     '낮이 되었습니다. 자유롭게 이야기하며 마피아를 찾아보세요.';
   private readonly nightMafiaGameMsg =
@@ -39,7 +39,7 @@ export class GameService {
   private readonly deathMsg = '님이 처형되었습니다.';
   private readonly liveMsg = '님이 생존하였습니다.';
   private readonly botName = 'Mafia Bot';
-  private readonly joinMsg = '가 참여했습니다!';
+  private readonly joinMsg = '님이 참여했습니다!';
   private readonly mafiaWinMsg =
     '마피아가 승리하였습니다! 거리에 총성이 울려퍼집니다...';
   private readonly citizenWinMsg =
@@ -217,25 +217,38 @@ export class GameService {
       const { players: closePlayers } = await this.getPlayers(chatId);
       const votes = closePlayers.map((player) => player.vote);
       const voteCounts = votes.reduce((acc, vote) => {
+        if (!vote) {
+          return acc;
+        }
         acc[vote] = (acc[vote] || 0) + 1;
         return acc;
       }, {});
       const maxVote = Object.entries(voteCounts).reduce((a, b) =>
         a[1] > b[1] ? a : b
       )[0];
-      const targetId = closePlayers.find(
-        (player) => player.callerId === maxVote
-      ).callerId;
+      const { callerId: targetId, username: targetUsername } =
+        closePlayers.find((player) => player.callerId === maxVote);
 
-      await sendAsBot(
-        channelId,
-        groupId,
-        broadcast,
-        rootMessageId,
-        `${targetId} ${this.closeStatementMafiaGameMsg}`,
-        this.botName
-      );
-      await new Promise((resolve) => setTimeout(resolve, 20000)); // 20초 대기
+      if (!targetId) {
+        await sendAsBot(
+          channelId,
+          groupId,
+          broadcast,
+          rootMessageId,
+          `아무도 마피아로 지목되지 않았습니다!`,
+          this.botName
+        );
+      } else {
+        await sendAsBot(
+          channelId,
+          groupId,
+          broadcast,
+          rootMessageId,
+          `${targetUsername} ${this.closeStatementMafiaGameMsg}`,
+          this.botName
+        );
+        await new Promise((resolve) => setTimeout(resolve, 20000)); // 20초 대기
+      }
 
       // 최종 투표
       await this.gameRepository.update(readyGame.id, {
