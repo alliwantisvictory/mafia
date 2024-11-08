@@ -1,4 +1,4 @@
-import { PlayerService } from "src/player/player.service";
+import { PlayerService } from 'src/player/player.service';
 // app.controller.ts
 import {
   Controller,
@@ -8,16 +8,16 @@ import {
   HttpStatus,
   Res,
   Get,
-} from "@nestjs/common";
-import { AppService } from "./app.service";
-import { Response } from "express";
-import { GameService } from "./game/game.service";
+} from '@nestjs/common';
+import { AppService } from './app.service';
+import { Response } from 'express';
+import { GameService } from './game/game.service';
 import {
   openWam,
   sendAsBot,
   tutorial,
   verification,
-} from "./common/utils/utils";
+} from './common/utils/utils';
 
 @Controller()
 export class AppController {
@@ -28,29 +28,29 @@ export class AppController {
 
   @Get()
   async getHello() {
-    return "hello!";
+    return 'hello!';
   }
 
-  @Put("/functions")
+  @Put('/functions')
   async handleFunction(
     @Body() body: any,
-    @Headers("x-signature") signature: string,
+    @Headers('x-signature') signature: string,
     @Res() res: Response
   ) {
     if (!signature || !verification(signature, JSON.stringify(body))) {
-      return res.status(HttpStatus.UNAUTHORIZED).send("Unauthorized");
+      return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
     }
 
     const { method, context, params } = body;
     const { caller, channel } = context;
 
-    console.log("body!!!", body);
-    console.log("context!!!", context);
+    console.log('body!!!', body);
+    console.log('context!!!', context);
 
     switch (method) {
-      case "tutorial":
-        return res.json(tutorial("wam_name", caller.id, params));
-      case "sendAsBot":
+      case 'tutorial':
+        return res.json(tutorial('wam_name', caller.id, params));
+      case 'sendAsBot':
         await sendAsBot(
           channel.id,
           params.input.groupId,
@@ -58,7 +58,7 @@ export class AppController {
           params.input.rootMessageId
         );
         break;
-      case "mafia":
+      case 'mafia':
         await this.gameService.createMafiaGame(
           context.channel.id,
           params.chat.id,
@@ -68,7 +68,7 @@ export class AppController {
           params.input.rootMessageId
         );
         break;
-      case "join":
+      case 'join':
         await this.gameService.joinMafiaGame(
           context.channel.id,
           params.chat.id,
@@ -78,10 +78,10 @@ export class AppController {
           params.input.rootMessageId
         );
         return res.json({ result: {} });
-      case "role":
+      case 'role':
         const role = await this.playerService.getJob(context.caller.id);
-        return res.json(openWam("ROLE", { role: role }, params));
-      case "start":
+        return res.json(openWam('ROLE', { role: role }, params));
+      case 'start':
         await this.gameService.startGame(
           context.channel.id,
           params.chat.id,
@@ -91,29 +91,35 @@ export class AppController {
           params.input.rootMessageId
         );
         break;
-      case "vote":
+      case 'vote':
         const { phase, players } = await this.gameService.getPlayers(
           params.chat.id
         );
-        console.log("vote!!!!!!!!!");
+        console.log('vote!!!!!!!!!');
         console.log(phase, players);
         return res.json(openWam(phase, { players }, params));
-      case "civilianVote":
+      case 'civilianVote':
         await this.gameService.civilianVote(
           params.chat.id,
           context.caller.id,
           params.input.vote
         );
         break;
-      case "deathVote":
+      case 'deathVote':
         await this.gameService.deathVote(
           params.chat.id,
           context.caller.id,
-          params.input.deathVote
+          params.input.vote
         );
         break;
+      case 'doctorVote':
+        await this.gameService.doctorVote(params.chat.id, params.input.vote);
+        break;
+      case 'mafiaVote':
+        await this.gameService.mafiaVote(params.chat.id, params.input.vote);
+        break;
       default:
-        return res.status(HttpStatus.BAD_REQUEST).send("Unknown method");
+        return res.status(HttpStatus.BAD_REQUEST).send('Unknown method');
     }
   }
 }

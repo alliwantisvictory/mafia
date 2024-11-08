@@ -214,7 +214,8 @@ export class GameService {
       await new Promise((resolve) => setTimeout(resolve, 20000)); // 20초 대기
 
       // 최종 변론
-      const votes = readyGame.players.map((player) => player.vote);
+      const { players: closePlayers } = await this.getPlayers(chatId);
+      const votes = closePlayers.map((player) => player.vote);
       const voteCounts = votes.reduce((acc, vote) => {
         if (!vote) {
           return acc;
@@ -225,8 +226,8 @@ export class GameService {
       const maxVote = Object.entries(voteCounts).reduce((a, b) =>
         a[1] > b[1] ? a : b
       )[0];
-      const { username: targetUsername, callerId: targetId } =
-        readyGame.players.find((player) => player.callerId === maxVote);
+      const { callerId: targetId, username: targetUsername } =
+        closePlayers.find((player) => player.callerId === maxVote);
 
       if (!targetId) {
         await sendAsBot(
@@ -443,5 +444,33 @@ export class GameService {
     }
 
     await this.playerService.deathVote(player.id, deathVote);
+  }
+
+  async doctorVote(chatId: string, vote: string) {
+    const game = await this.gameRepository.findOne({
+      where: { chatId: chatId, phase: GamePhase.CLOSE_STATEMENT },
+      relations: ['players'],
+    });
+    if (!game) {
+      throw new Error('현재 투표 중이지 않습니다.');
+    }
+
+    await this.gameRepository.update(game.id, {
+      doctorSelect: vote,
+    });
+  }
+
+  async mafiaVote(chatId: string, vote: string) {
+    const game = await this.gameRepository.findOne({
+      where: { chatId: chatId, phase: GamePhase.CLOSE_STATEMENT },
+      relations: ['players'],
+    });
+    if (!game) {
+      throw new Error('현재 투표 중이지 않습니다.');
+    }
+
+    await this.gameRepository.update(game.id, {
+      mafiaSelect: vote,
+    });
   }
 }
