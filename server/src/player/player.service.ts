@@ -23,4 +23,8 @@ export class PlayerService {
   async deathVote(id: string, deathVote: boolean) {
     await this.playerRepository.update({ id }, { deathVote });
   }
+
+  async kill(id: string) {
+    await this.playerRepository.update({ id }, { isAlive: false });
+  }
 }
